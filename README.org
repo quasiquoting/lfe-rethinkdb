@@ -7,7 +7,7 @@ RethinkDB driver in LFE.
 Initially based on [[https://github.com/kureikain][@kureikain]]'s [[https://github.com/kureikain/relang][version]], but it's already changed a lot
 and is phasing out
 - vanilla Erlang, in favor of LFE
-- simple functions, in favor of a more structured (`gen_server`?) approach
+- simple functions, in favor of a more structured (=gen_server=?) approach
 - (seemingly) manual records and macros, in favor of Protocol Buffers
 
 #+BEGIN_QUOTE
