@@ -1,7 +1,7 @@
 * lefink
-/Le Fink/, like [[https://github.com/taybin/lethink][lethink]] with a [[https://github.com/rvirding/lfe][LFE]] twist.
-
 An [[https://github.com/rvirding/lfe][LFE]] driver for [[http://rethinkdb.com/][RethinkDB]].
+
+/Le Fink/, like [[https://github.com/taybin/lethink][lethink]] with a [[https://github.com/rvirding/lfe][LFE]] twist.
 
 *NEEDS A BETTER NAME*
 
