@@ -36,6 +36,4 @@
 ;;; ============================================================================
 
 (defun generate-token ()
-  (apply #'random:seed/3 (tuple_to_list (os:timestamp)))
-  (let ((n (random:uniform 3709551616)))
-    (binary (n (size 64) little))))
+  (binary ((lf-data:rand-int 3709551616) (size 64) little)))
