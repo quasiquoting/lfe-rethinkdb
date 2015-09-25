@@ -1,0 +1,7 @@
+{application, lefink,
+ [{description,  "An LFE driver for RethinkDB."},
+  {vsn,          "1"},
+  {registered,   ['lf-sup']},
+  {applications, [kernel, stdlib]},
+  {mod,          {'lf-app', []}},
+  {env,          []}]}.
