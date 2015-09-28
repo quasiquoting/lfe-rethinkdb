@@ -27,7 +27,7 @@
 
 (defun start_link (ref opts)
   (let ((`#(ok ,pid) (gen_server:start_link (MODULE) `(,opts) '())))
-    (lf-server:add_worker ref pid)
+    (lf-server:add-worker ref pid)
     `#(ok ,pid)))
 
 (defun db

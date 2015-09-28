@@ -37,17 +37,17 @@
 ;;; ===                       gen_server callbacks                           ===
 ;;; ============================================================================
 
-(defun init (['()] `#(ok (make-state))))
+(defun init (['()] `#(ok ,(make-state))))
 
 (defun handle_call
   (['stop _from state] `#(stop normal stopped ,state))
   ([_req  _from state] `#(reply ignored ,state)))
 
 (defun handle_cast
-  ([`#(add-pool ,ref) (= (match-state pools pools) state)]
-   (let (('true (insert-pool ref '[])))
+  ([`#(add-pool ,ref) (= state (match-state pools pools))]
+   (let (('true (insert-new-pool ref '[])))
      `#(noreply ,(set-state-pools state `(,ref . ,pools)))))
-  ([`#(remote-pool ,ref) (= (match-state pools pools) state)]
+  ([`#(remote-pool ,ref) (= state (match-state pools pools))]
    (let (('true (ets:delete (MODULE) `#(pool ,ref))))
      `#(noreply ,(set-state-pools state (lists:delete ref pools)))))
   ([`#(add-worker ,ref ,pid) state]
@@ -59,7 +59,7 @@
    `#(noreply ,state)))
 
 (defun handle_info
-  ([`#(DOWN ,_ process ,pid ,_) (= (match-state pools pools) state)]
+  ([`#(DOWN ,_ process ,pid ,_) (= state (match-state pools pools))]
    (lists:foreach
     (lambda (ref)
       (let ((workers (get-all-workers ref)))
@@ -82,3 +82,5 @@
 ;;; ============================================================================
 
 (defun insert-pool (ref workers) (ets:insert (MODULE) `#(#(pool ,ref) ,workers)))
+
+(defun insert-new-pool (ref workers) (ets:insert_new (MODULE) `#(#(pool ,ref) ,workers)))

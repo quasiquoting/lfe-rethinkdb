@@ -9,6 +9,6 @@
   (['()]
    (let* ((opts '(ordered_set public named_table #(read_concurrency true)))
           ('lf-server (ets:new 'lf-server opts))
-          (procs '#(lf-server #(lf-server start_link [])
-                              permanent 5000 worker [lf-server])))
+          (procs '(#(lf-server #(lf-server start_link [])
+                               permanent 5000 worker [lf-server]))))
      `#(ok #(#(one_for_one 10 10) ,procs)))))

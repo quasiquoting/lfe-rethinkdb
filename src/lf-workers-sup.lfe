@@ -7,6 +7,6 @@
 
 (defun init
   (['()]
-   (let ((procs '(lf-worker #(lf-worker start_link [])
-                            transient 5000 worker [lf-worker])))
+   (let ((procs '(#(lf-worker #(lf-worker start_link [])
+                              transient 5000 worker [lf-worker]))))
      `#(ok #(#(simple_one_for_one 1000 10) ,procs)))))
