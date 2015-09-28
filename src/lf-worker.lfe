@@ -16,7 +16,7 @@
 
 (defun V0_4 () (lf-data:le-32-int (ql2:enum_value_by_symbol 'VersionDummy.Version 'V0_4)))
 
-;; (defun JSON () (le-32-int (ql2:enum_value_by_symbol 'VersionDummy.Protocol 'JSON)))
+(defun JSON () (lf-data:le-32-int (ql2:enum_value_by_symbol 'VersionDummy.Protocol 'JSON)))
 
 ;; (defun STOP () (ql2:enum_value_by_symbol 'Query.QueryType 'STOP))
 
@@ -121,6 +121,7 @@
 (defun login (socket auth-key)
   (let (('ok (gen_tcp:send socket (V0_4)))
         ('ok (gen_tcp:send socket (tuple_to_list (lf-data:len auth-key))))
+        ('ok (gen_tcp:send socket (JSON)))
         (`#(ok ,response) (read-until-null socket)))
     (case (== response #"SUCCESS\x0;")
       ('true  'ok)
