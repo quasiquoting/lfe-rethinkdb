@@ -1,7 +1,7 @@
 (defmodule lefink
   (export (start 0) (stop 0)
           (add-pool 2) (add-pool 3) (remove-pool 1)
-          (db 2)
+          (use 2)
           (query 2)))
 
 (defun start ()
@@ -32,12 +32,12 @@
     ('ok   (supervisor:delete_child 'lf-sup `#(lf-workers-sup ,ref)))
     (error error)))
 
-(defun db
+(defun use
   ([ref name] (when (is_binary name))
-   (lists:foreach (lambda (pid) (lf-worker:db pid name))
+   (lists:foreach (lambda (pid) (lf-worker:use pid name))
                   (lf-server:get-all-workers ref))))
 
 (defun query (ref raw-query)
-  (let ((term (relang_ast:build_query raw-query))
+  (let ((term (lf-ast:build-query raw-query))
         (pid  (lf-server:get-worker ref)))
     (lf-worker:query pid term)))
