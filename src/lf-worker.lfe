@@ -1,7 +1,7 @@
 (defmodule lf-worker
   (behaviour gen_server)
   ;; API
-  (export (start_link 2) (db 2) (query 2))
+  (export (start_link 2) (use 2) (query 2))
   ;; gen_server
   (export (init 1)
           (handle_call 3) (handle_cast 2) (handle_info 2)
@@ -30,7 +30,7 @@
     (lf-server:add-worker ref pid)
     `#(ok ,pid)))
 
-(defun db
+(defun use
   ([pid name] (when (is_binary name))
    (gen_server:cast pid `#(use ,name))))
 
