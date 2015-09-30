@@ -7,7 +7,7 @@
           (handle_call 3) (handle_cast 2) (handle_info 2)
           (terminate 2) (code_change 3)))
 
-(include-file "include/ql2_pb.hrl")
+(include-file "include/ql2.hrl")
 
 (defrecord state socket database (token 1))
 
@@ -59,7 +59,7 @@
   ([`#(query ,term) _from (= state (match-state database database
                                                 socket   socket
                                                 token    token))]
-   (let* ((query (make-query type 'START
+   (let* ((query (make-Query type 'START
                              query term
                              token token
                              global_optargs `(,(ql2-util:global-db database))))
@@ -103,18 +103,18 @@
     response))
 
 (defun handle-response
-  ([(match-response type 'SUCCESS_ATOM response `(,datum))]
+  ([(match-Response type 'SUCCESS_ATOM response `(,datum))]
    `#(ok ,(ql2-util:datum-value datum)))
-  ([(match-response type 'SUCCESS_SEQUENCE response data)]
+  ([(match-Response type 'SUCCESS_SEQUENCE response data)]
    `#(ok ,(lists:map #'ql2-util:datum-value/1 data)))
-  ([(match-response type 'SUCCESS_PARTIAL response `(,datum))]
+  ([(match-Response type 'SUCCESS_PARTIAL response `(,datum))]
    `#(ok ,(ql2-util:datum-value datum)))
-  ([(= (match-response type 'CLIENT_ERROR)  response)] (handle-error response))
-  ([(= (match-response type 'COMPILE_ERROR) response)] (handle-error response))
-  ([(= (match-response type 'RUNTIME_ERROR) response)] (handle-error response)))
+  ([(= (match-Response type 'CLIENT_ERROR)  response)] (handle-error response))
+  ([(= (match-Response type 'COMPILE_ERROR) response)] (handle-error response))
+  ([(= (match-Response type 'RUNTIME_ERROR) response)] (handle-error response)))
 
 (defun handle-error
-  ([(match-response response `(,datum) type type backtrace backtrace)]
+  ([(match-Response response `(,datum) type type backtrace backtrace)]
    (let ((error-msg (ql2-util:datum-value datum)))
      `#(error ,error-msg ,type ,backtrace))))
 
