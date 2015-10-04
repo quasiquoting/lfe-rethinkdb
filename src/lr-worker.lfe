@@ -147,33 +147,3 @@
     (case (is-null-terminated? response)
       ('true  `#(ok ,(iolist_to_binary result)))
       ('false (read-until-null socket result)))))
-
-
-
-
-;; (defun stream-recv (socket token)
-;;   (receive (r (io:fwrite "Change feed received: ~p~n" `(,r))))
-;;   (stream-recv socket token))
-
-;; ;; TODO: may want to loop on failure too...
-;; (defun stream-poll
-;;   ([`#(,socket ,token) pid]
-;;    (let ((`#(,length ,query) (lr-data:len '("[2]"))))
-;;      ;; (io:format "Block socket <<< waiting for more data from stream~n")
-;;      (gen_tcp:send socket `(,token ,length ,query))
-;;      (case (gen_tcp:send socket `(,token ,length ,query))
-;;        ((= `#(error ,_reason) failure) failure)
-;;        ('ok
-;;         (case (recv socket)
-;;           ((= `#(error ,_reason) failure) failure)
-;;           (`#(ok ,packet)
-;;            ;; TODO: validate type
-;;            (spawn (lambda () (! pid (lr-response:get-response (ljson:decode packet)))))
-;;            (stream-poll `#(,socket ,token) pid))))))))
-
-;; When the response_type is SUCCESS_PARTIAL=3, we can call next to send more data
-;; (defun next (_query) 'continue)
-
-;; (defun stream-stop (socket token)
-;;   (let* ((`#(,length ,query) (lr-data:len (ljson:encode `(,(STOP)))))
-;;          ('ok     (gen_tcp:send socket `(,token ,length ,query))))))
