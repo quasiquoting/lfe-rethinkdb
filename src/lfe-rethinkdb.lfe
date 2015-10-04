@@ -38,6 +38,6 @@
                   (lr-server:get-all-workers ref))))
 
 (defun query (ref raw-query)
-  (let ((term (lr-ast:build-query raw-query))
+  (let ((term (lr-query:build-query raw-query))
         (pid  (lr-server:get-worker ref)))
     (lr-worker:query pid term)))

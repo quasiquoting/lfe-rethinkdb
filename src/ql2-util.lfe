@@ -17,5 +17,5 @@
      ,(datum-value (Datum.AssocPair-val obj))))
 
 (defun global-db (value)
-  (let ((val (make-Term type 'DB args (lr-ast:expr value))))
+  (let ((val (make-Term type 'DB args (lr-query:expr value))))
     (make-Query.AssocPair key #"db" val val)))
