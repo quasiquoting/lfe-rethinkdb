@@ -31,6 +31,8 @@
   ([(match-Term type type args terms)]
    `(,(ql2:enum_value_by_symbol 'Term.TermType type)
      ,(lists:map #'encode-term/1 terms)))
+  ([(match-Term.AssocPair key key val val)]
+   `(#(,key ,(encode-term val))))
   ([_] []))
 
 (defun encode-datum
