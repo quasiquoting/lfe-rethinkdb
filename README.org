@@ -1,24 +1,8 @@
-* lefink
+* lfe-rethinkdb
 An [[https://github.com/rvirding/lfe][LFE]] driver for [[http://rethinkdb.com/][RethinkDB]].
-
-/Le Fink/, like [[https://github.com/taybin/lethink][lethink]] with a [[https://github.com/rvirding/lfe][LFE]] twist.
-
-*NEEDS A BETTER NAME*
-
-** Introduction
-Initially based on [[https://github.com/kureikain][@kureikain]]'s [[https://github.com/kureikain/relang][version]], but it's already changed a lot
-and is phasing out
-- vanilla Erlang, in favor of LFE
-- simple functions, in favor of a more structured (=gen_server=?) approach
-- (seemingly) manual records and macros, in favor of Protocol Buffers
-
-#+BEGIN_QUOTE
-My implementation is very simple and maybe buggy but I inspied by
-https://github.com/taybin/lethink especially on the query syntax.
-#+END_QUOTE
 
 ** Building/Usage
 #+BEGIN_SRC fish
-$ rebar get-deps compile
-$ lfe -pa ebin -pa deps/*/ebin
+$ rebar get-deps compile                           # make get-deps compile
+$ lfe -pa ebin -pa deps/*/ebin -I deps/gpb/include # make shell
 #+END_SRC
