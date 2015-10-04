@@ -1,5 +1,5 @@
 (defmodule lf-query
-  (export (query 1) (query 2) (query 3)
+  (export (query 1) (query 2)
           (encode-query 1)))
 
 (include-file "include/ql2.hrl")
@@ -15,23 +15,12 @@
 (defun query (raw-query) (query raw-query '[#()]))
 
 (defun query
-  ([raw-query opts] (when (is_list raw-query))
-   (let ((query-ast (lf-ast:build-query raw-query)))
-     (ljson:encode `(,(START) ,(++ query-ast opts)))))
-  ([socket raw-query]
-   ;; Build and run query when passing `socket'
-   (query socket raw-query '[#()])))
-
-(defun query (socket raw-query opts)
-  (let* ((token              (generate-token))
-         (`#(,length ,query) (lf-data:len (query raw-query opts))))
-    (case (gen_tcp:send socket `(,token ,length ,query))
-      ((= `#(error ,_reason) failure) failure)
-      ('ok
-       (case (lf-net:recv socket)
-         ((= `#(error ,_reason) failure) failure)
-         (`#(ok ,packet)
-          (lf-response:handle socket token packet)))))))
+  ([raw-query _opts] (when (is_list raw-query))
+   (make-Query type 'START
+               query (lf-ast:build-query raw-query)
+               token (generate-token)
+               ;; global_optargs `(,(ql2-util:global-db database))
+               )))
 
 (defun encode-query
   ([(match-Query type 'START query term)]
