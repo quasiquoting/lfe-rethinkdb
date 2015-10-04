@@ -17,4 +17,4 @@ eunit:
 	$(REBAR) eu skip_deps=true
 
 repl:
-	lfe -pa ebin -pa deps/*/ebin
+	rlwrap -a 'dummy' lfe -pa ebin -pa deps/*/ebin -I deps/gpb/include
