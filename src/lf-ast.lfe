@@ -58,12 +58,8 @@
   (['()]                          (make-Term type 'TABLE_LIST))
   ([(= db (match-Term type 'DB))] (make-Term type 'TABLE_LIST args db)))
 
-(defun count
-  ([(= table (match-Term type 'TABLE))]
-   (make-Term type 'COUNT args `(,table)))
-  ([_]
-   '#(error #"count must follow table operator")))
 
+(defun count (args) (make-Term type 'COUNT args `(,args)))
 
 (defun db
   ([name '()] (when (is_binary name))
