@@ -159,6 +159,13 @@
   ([value term] (when (orelse (is_number value) (is_binary value)))
    (make-Term type 'LIMIT args (++ `(,term) `(,(expr value))))))
 
+(defun filter
+  ([obj-or-func sq]
+   (io:fwrite "~p~n" `(,obj-or-func))
+   (make-Term type 'FILTER args (++ `(,sq) `(,(expr obj-or-func)))))
+  ([_ _]
+   '#(error #"something terrible happened")))
+
 (defun expr ([data '()] (expr data)))
 
 (defun expr
