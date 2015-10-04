@@ -1,4 +1,4 @@
-(defmodule lf-ast
+(defmodule lr-ast
   (export all))
 
 (include-file "include/ql2.hrl")

@@ -1,4 +1,4 @@
-(defmodule lf-workers-sup
+(defmodule lr-workers-sup
   (behaviour supervisor)
   (export (start_link 0))
   (export (init 1)))
@@ -7,6 +7,6 @@
 
 (defun init
   (['()]
-   (let ((procs '(#(lf-worker #(lf-worker start_link [])
-                              transient 5000 worker [lf-worker]))))
+   (let ((procs '(#(lr-worker #(lr-worker start_link [])
+                              transient 5000 worker [lr-worker]))))
      `#(ok #(#(simple_one_for_one 1000 10) ,procs)))))

@@ -1,5 +1,5 @@
 * lfe-rethinkdb
-An [[https://github.com/rvirding/lfe][LFE]] driver for [[http://rethinkdb.com/][RethinkDB]].
+An [[https://github.com/rvirding/lfe][LFE]] driver for [[http://rethinkdb.com][RethinkDB]], heavily inspired by [[https://github.com/apa512/clj-rethinkdb][clj-rethinkdb]].
 
 ** Building/Usage
 #+BEGIN_SRC fish

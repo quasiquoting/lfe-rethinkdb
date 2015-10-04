@@ -1,8 +1,8 @@
-(defmodule lf-net
+(defmodule lr-net
   (export (handshake 2)
           (recv 1)
           (stream-recv 2) (stream-poll 2))
-  (import (from lf-data (le-32-int 1) (len 1))))
+  (import (from lr-data (le-32-int 1) (len 1))))
 
 ;;; http://rethinkdb.com/docs/writing-drivers/
 
@@ -54,7 +54,7 @@
           ((= `#(error ,_reason) failure) failure)
           (`#(ok ,packet)
            ;; TODO: validate type
-           (spawn (lambda () (! pid (lf-response:get-response (ljson:decode packet)))))
+           (spawn (lambda () (! pid (lr-response:get-response (ljson:decode packet)))))
            (stream-poll `#(,socket ,token) pid))))))))
 
 

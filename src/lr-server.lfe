@@ -1,4 +1,4 @@
-(defmodule lf-server
+(defmodule lr-server
   (behaviour gen_server)
   ;; API
   (export (start_link 0) (stop 0)
@@ -28,7 +28,7 @@
 
 (defun add-worker (ref pid) (gen_server:cast (MODULE) `#(add-worker ,ref ,pid)))
 
-(defun get-worker (ref) (lf-data:rand-nth (get-all-workers ref)))
+(defun get-worker (ref) (lr-data:rand-nth (get-all-workers ref)))
 
 (defun get-all-workers (ref) (ets:lookup_element (MODULE) `#(pool ,ref) 2))
 

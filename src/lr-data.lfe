@@ -1,4 +1,4 @@
-(defmodule lf-data
+(defmodule lr-data
   (export (len 1) (le-32-int 1)
           (rand-int 1)
           (rand-nth 1)))

@@ -1,4 +1,4 @@
-(defmodule lf-worker
+(defmodule lr-worker
   (behaviour gen_server)
   ;; API
   (export (start_link 2) (use 2) (query 2))
@@ -14,9 +14,9 @@
 
 ;;; http://rethinkdb.com/docs/writing-drivers/
 
-(defun V0_4 () (lf-data:le-32-int (ql2:enum_value_by_symbol 'VersionDummy.Version 'V0_4)))
+(defun V0_4 () (lr-data:le-32-int (ql2:enum_value_by_symbol 'VersionDummy.Version 'V0_4)))
 
-(defun JSON () (lf-data:le-32-int (ql2:enum_value_by_symbol 'VersionDummy.Protocol 'JSON)))
+(defun JSON () (lr-data:le-32-int (ql2:enum_value_by_symbol 'VersionDummy.Protocol 'JSON)))
 
 ;; (defun STOP () (ql2:enum_value_by_symbol 'Query.QueryType 'STOP))
 
@@ -27,7 +27,7 @@
 
 (defun start_link (ref opts)
   (let ((`#(ok ,pid) (gen_server:start_link (MODULE) `(,opts) '())))
-    (lf-server:add-worker ref pid)
+    (lr-server:add-worker ref pid)
     `#(ok ,pid)))
 
 (defun use
@@ -35,7 +35,7 @@
    (gen_server:cast pid `#(use ,name))))
 
 (defun query (pid query)
-  (let ((timeout (application:get_env 'lefink 'timout 30000)))
+  (let ((timeout (application:get_env 'lfe-rethinkdb 'timout 30000)))
     (gen_server:call pid `#(query ,query) timeout)))
 
 
@@ -96,7 +96,7 @@
 
 (defun send (socket query)
   (let* ((token (binary ((Query-token query) (size 64) little)))
-         (`#(,length ,data) (lf-data:len (lf-query:encode-query query))))
+         (`#(,length ,data) (lr-data:len (lr-query:encode-query query))))
     (gen_tcp:send socket `(,token ,length ,data))))
 
 (defun recv (socket)
@@ -124,7 +124,7 @@
 
 (defun login (socket auth-key)
   (let (('ok (gen_tcp:send socket (V0_4)))
-        ('ok (gen_tcp:send socket (tuple_to_list (lf-data:len auth-key))))
+        ('ok (gen_tcp:send socket (tuple_to_list (lr-data:len auth-key))))
         ('ok (gen_tcp:send socket (JSON)))
         (`#(ok ,response) (read-until-null socket)))
     (case (== response #"SUCCESS\x0;")
@@ -158,7 +158,7 @@
 ;; ;; TODO: may want to loop on failure too...
 ;; (defun stream-poll
 ;;   ([`#(,socket ,token) pid]
-;;    (let ((`#(,length ,query) (lf-data:len '("[2]"))))
+;;    (let ((`#(,length ,query) (lr-data:len '("[2]"))))
 ;;      ;; (io:format "Block socket <<< waiting for more data from stream~n")
 ;;      (gen_tcp:send socket `(,token ,length ,query))
 ;;      (case (gen_tcp:send socket `(,token ,length ,query))
@@ -168,12 +168,12 @@
 ;;           ((= `#(error ,_reason) failure) failure)
 ;;           (`#(ok ,packet)
 ;;            ;; TODO: validate type
-;;            (spawn (lambda () (! pid (lf-response:get-response (ljson:decode packet)))))
+;;            (spawn (lambda () (! pid (lr-response:get-response (ljson:decode packet)))))
 ;;            (stream-poll `#(,socket ,token) pid))))))))
 
 ;; When the response_type is SUCCESS_PARTIAL=3, we can call next to send more data
 ;; (defun next (_query) 'continue)
 
 ;; (defun stream-stop (socket token)
-;;   (let* ((`#(,length ,query) (lf-data:len (ljson:encode `(,(STOP)))))
+;;   (let* ((`#(,length ,query) (lr-data:len (ljson:encode `(,(STOP)))))
 ;;          ('ok     (gen_tcp:send socket `(,token ,length ,query))))))

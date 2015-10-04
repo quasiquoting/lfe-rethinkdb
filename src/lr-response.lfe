@@ -1,4 +1,4 @@
-(defmodule lf-response
+(defmodule lr-response
   (export (get-type 1) (get-response 1)
           (handle 3)))
 
@@ -14,8 +14,8 @@
      ((success? t) `#(ok ,r))
      ((partial? t)
       ;; (io:format "Partial response <<< Get more data~n")
-      (let* ((recv (spawn 'lf-net 'stream-recv `(,socket ,token)))
-             (pid  (spawn 'lf-net 'stream-poll `(#(,socket ,token) ,recv))))
+      (let* ((recv (spawn 'lr-net 'stream-recv `(,socket ,token)))
+             (pid  (spawn 'lr-net 'stream-poll `(#(,socket ,token) ,recv))))
         ;; (io:format "Do something else here~n")
         `#(ok #(pid ,pid) ,r)))
      ((error? t)  `#(error ,r))

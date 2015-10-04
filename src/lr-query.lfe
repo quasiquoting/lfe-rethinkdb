@@ -1,4 +1,4 @@
-(defmodule lf-query
+(defmodule lr-query
   (export (query 1) (query 2)
           (encode-query 1)))
 
@@ -17,7 +17,7 @@
 (defun query
   ([raw-query _opts] (when (is_list raw-query))
    (make-Query type 'START
-               query (lf-ast:build-query raw-query)
+               query (lr-ast:build-query raw-query)
                token (generate-token)
                ;; global_optargs `(,(ql2-util:global-db database))
                )))
@@ -49,4 +49,4 @@
 ;;; ============================================================================
 
 (defun generate-token ()
-  (binary ((lf-data:rand-int 3709551616) (size 64) little)))
+  (binary ((lr-data:rand-int 3709551616) (size 64) little)))

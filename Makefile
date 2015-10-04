@@ -1,9 +1,12 @@
-PROJECT   = lefink
+PROJECT   = lfe-rethinkdb
 REBAR    := $(shell which rebar)
 VERSION   = 0.1
 
 .PHONY: all
 all: get-deps compile repl
+
+clean:
+	$(REBAR) clean
 
 get-deps:
 	$(REBAR) get-deps
