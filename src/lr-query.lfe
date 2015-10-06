@@ -458,5 +458,5 @@
 (defun encode-datum
   ([(match-Datum type 'R_NULL)]                                'null)
   ([(match-Datum type 'R_BOOL r_bool v)] (when (is_boolean v)) v)
-  ([(match-Datum type 'R_NUM  r_num v)]  (when (is_number v))  v)
-  ([(match-Datum type 'R_STR  r_str v)]  (when (is_binary v))  v))
+  ([(match-Datum type 'R_NUM  r_num v)]  (when (is_number  v)) v)
+  ([(match-Datum type 'R_STR  r_str v)]  (when (is_binary  v)) v))
