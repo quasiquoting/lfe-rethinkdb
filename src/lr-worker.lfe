@@ -35,7 +35,7 @@
    (gen_server:cast pid `#(use ,name))))
 
 (defun query (pid query)
-  (let ((timeout (application:get_env 'lfe-rethinkdb 'timout 30000)))
+  (let ((timeout (application:get_env 'lfe-rethinkdb 'timeout 30000)))
     (gen_server:call pid `#(query ,query) timeout)))
 
 
