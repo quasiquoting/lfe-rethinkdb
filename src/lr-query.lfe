@@ -453,6 +453,8 @@
      ,(lists:map #'encode-term/1 terms)))
   ([(match-Term.AssocPair key key val val)]
    `(#(,key ,(encode-term val))))
+  ([(match-Query.AssocPair key key val val)]
+   `(#(,key ,(encode-term val))))
   ([_] []))
 
 (defun encode-datum
