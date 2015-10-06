@@ -27,8 +27,9 @@
                )))
 
 (defun encode-query
-  ([(match-Query type 'START query term)]
-   (ljson:encode `(,(START) ,(++ (encode-term term) '[#()])))))
+  ([(= query (match-Query type 'START query term global_optargs optargs))]
+   (ljson:encode `(,(START) ,(encode-term term)
+                   ,(lists:flatmap #'encode-term/1 optargs)))))
 
 
 ;;; ============================================================================
