@@ -114,7 +114,7 @@
 
 (defun insert
   ([data options (= table (match-Term type 'TABLE))]
-   (let ((args    (++ `(,table) `(,(expr data))))
+   (let ((args    `(,table . (,(expr data))))
          (optargs (lists:map #'insert-option-term/1 options)))
      (term 'INSERT args optargs)))
   ([_ _ _]
@@ -125,7 +125,7 @@
   ([data (= selection (match-Term type type))]
    (when (orelse (== type 'TABLE)   (== type 'GET)
                  (== type 'BETWEEN) (== type 'FILTER)))
-   (let ((args (++ `(,selection) `(,(func-wrap data)))))
+   (let ((args `(,selection . (,(func-wrap data)))))
      (term 'UPDATE args))))
 
 ;; TODO: verify, optargs(, generalize?)
