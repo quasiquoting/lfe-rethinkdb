@@ -449,9 +449,10 @@
 
 (defun encode-term
   ([(match-Term type 'DATUM datum datum)] (encode-datum datum))
-  ([(match-Term type type args terms)]
+  ([(match-Term type type args terms optargs optargs)]
    `(,(ql2:enum_value_by_symbol 'Term.TermType type)
-     ,(lists:map #'encode-term/1 terms)))
+     ,(lists:map #'encode-term/1 terms)
+     ,(lists:flatmap #'encode-term/1 optargs)))
   ([(match-Term.AssocPair key key val val)]
    `(#(,key ,(encode-term val))))
   ([(match-Query.AssocPair key key val val)]
