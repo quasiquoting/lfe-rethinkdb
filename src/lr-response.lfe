@@ -35,9 +35,8 @@
   (try (ql2:enum_symbol_by_value 'Response.ResponseType val)
     (catch (_ 'undefined))))
 
-(defun success? (type) (lists:member type '(SUCCESS_ATOM SUCCESS_SEQUENCE)))
+(defun error? (type)
+  (lists:member type '(CLIENT_ERROR COMPILE_ERROR RUNTIME_ERROR)))
 
 (defun partial? (type) (=:= type 'SUCCESS_PARTIAL))
 
-(defun error? (type)
-  (lists:member type '(CLIENT_ERROR COMPILE_ERROR RUNTIME_ERROR)))
