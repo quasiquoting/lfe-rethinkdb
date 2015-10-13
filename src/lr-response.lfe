@@ -40,3 +40,10 @@
 
 (defun partial? (type) (=:= type 'SUCCESS_PARTIAL))
 
+(defun proplist?
+  (['()]                                 'true)
+  ([`(#(,_ ,_) . ,t)]                    (proplist? t))
+  ([`(,h       . ,t)] (when (is_atom h)) (proplist? t))
+  ([_]                                   'false))
+
+(defun success? (type) (lists:member type '(SUCCESS_ATOM SUCCESS_SEQUENCE)))
