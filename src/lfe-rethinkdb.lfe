@@ -5,10 +5,12 @@
           (query 2)))
 
 (defun start ()
+  "Start the application."
   (application:start 'lfe_rethinkdb)
   'ok)
 
 (defun stop ()
+  "Stop the application."
   (application:stop 'lfe_rethinkdb)
   'ok)
 

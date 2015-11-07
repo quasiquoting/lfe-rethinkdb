@@ -1,4 +1,4 @@
 [submodule "_site"]
-	path = _site
+	path = doc
 	url = git@github.com:quasiquoting/lfe-rethinkdb.git
 	branch = gh-pages

@@ -15,10 +15,16 @@
 ;;; ============================================================================
 
 ;; I definitely don't love this...
-(defun query (raw-query) (query raw-query '[#()]))
+(defun query (raw-query)
+  "Encode a given raw query and return the result."
+  (query raw-query '[#()]))
 
 ;; TODO optargs
 (defun query
+  "Given a raw query and a list of options*, call [[build-query/1]] and return
+a Query with a new token (via [[generate-token/0]]).
+
+* Currently ignored."
   ([raw-query _opts] (when (is_list raw-query))
    (make-Query type 'START
                query (build-query raw-query)
