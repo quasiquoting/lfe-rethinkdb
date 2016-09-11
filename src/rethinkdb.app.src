@@ -4,7 +4,20 @@
   {applications, [kernel, stdlib, sasl]},
   {registered,   [rethinkdb, rethinkdb_sup]},
   {mod,          {rethinkdb, []}},
-  {env,          [{timeout, 30000}]},
+  {env, [
+    {timeout, 30000},
+    {pools, [
+      {pool1, [
+        {size,         10},
+        {max_overflow, 20}
+      ], [
+        {host,     {127,0,0,1}},
+        {port,     28015},
+        {database, <<"test">>},
+        {auth_key, <<>>}
+      ]}
+    ]}
+  ]},
 
   {maintainers, ["Eric Bailey"]},
   {licenses,    ["BSD-3"]},
