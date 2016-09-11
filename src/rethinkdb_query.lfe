@@ -1,4 +1,4 @@
-(defmodule lr-query
+(defmodule rethinkdb_query
   (export (query 1) (query 2)
           (encode-query 1)
           (build-query 1)
@@ -9,10 +9,7 @@
 
 (defun START () (ql2:enum_value_by_symbol 'Query.QueryType 'START))
 
-
-;;; ============================================================================
-;;; ===                            PUBLIC API                                ===
-;;; ============================================================================
+;;; ==================================================================== [ API ]
 
 ;; I definitely don't love this...
 (defun query (raw-query)
@@ -34,13 +31,11 @@ a Query with a new token (via [[generate-token/0]]).
 
 (defun encode-query
   ([(= query (match-Query type 'START query term global_optargs optargs))]
-   (ljson:encode `(,(START) ,(encode-term term)
-                   ,(lists:flatmap #'encode-term/1 optargs)))))
+   (jsx:encode `(,(START) ,(encode-term term)
+                 ,(lists:flatmap #'encode-term/1 optargs)))))
 
 
-;;; ============================================================================
-;;; ===                           PRIVATE API                                ===
-;;; ============================================================================
+;;; ===================================================== [ Internal functions ]
 
 (defun build-query (query-list) (apply-seq query-list '()))
 
@@ -54,7 +49,7 @@ a Query with a new token (via [[generate-token/0]]).
    result))
 
 (defun generate-token ()
-  (binary ((lr-data:rand-int 3709551616) (size 64) little)))
+  (binary ((rethinkdb_data:rand-int 3709551616) (size 64) little)))
 
 
 ;;; PREDICATES
@@ -470,3 +465,5 @@ a Query with a new token (via [[generate-token/0]]).
   ([(match-Datum type 'R_BOOL r_bool v)] (when (is_boolean v)) v)
   ([(match-Datum type 'R_NUM  r_num v)]  (when (is_number  v)) v)
   ([(match-Datum type 'R_STR  r_str v)]  (when (is_binary  v)) v))
+
+;;; ==================================================================== [ EOF ]

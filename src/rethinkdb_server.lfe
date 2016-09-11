@@ -1,4 +1,4 @@
-(defmodule lr-server
+(defmodule rethinkdb_server
   (behaviour gen_server)
   ;; API
   (export (start_link 0) (stop 0)
@@ -12,10 +12,7 @@
 
 (defrecord state (pools '[]))
 
-
-;;; ============================================================================
-;;; ===                               API                                    ===
-;;; ============================================================================
+;;; ==================================================================== [ API ]
 
 (defun start_link ()
   (gen_server:start_link `#(local ,(MODULE)) (MODULE) '[] '[]))
@@ -28,14 +25,11 @@
 
 (defun add-worker (ref pid) (gen_server:cast (MODULE) `#(add-worker ,ref ,pid)))
 
-(defun get-worker (ref) (lr-data:rand-nth (get-all-workers ref)))
+(defun get-worker (ref) (rethinkdb_data:rand-nth (get-all-workers ref)))
 
 (defun get-all-workers (ref) (ets:lookup_element (MODULE) `#(pool ,ref) 2))
 
-
-;;; ============================================================================
-;;; ===                       gen_server callbacks                           ===
-;;; ============================================================================
+;;; =================================================== [ gen_server callbacks ]
 
 (defun init (['()] `#(ok ,(make-state))))
 
@@ -61,13 +55,13 @@
 (defun handle_info
   ([`#(DOWN ,_ process ,pid ,_) (= state (match-state pools pools))]
    (lists:foreach
-    (lambda (ref)
-      (let ((workers (get-all-workers ref)))
-        (case (lists:member pid workers)
-          ('false 'false)
-          ('true
-           (let (('true (insert-pool ref (lists:delete pid workers)))))))))
-    pools)
+     (lambda (ref)
+       (let ((workers (get-all-workers ref)))
+         (case (lists:member pid workers)
+           ('false 'false)
+           ('true
+            (let (('true (insert-pool ref (lists:delete pid workers)))))))))
+     pools)
    `#(noreply ,state))
   ([_info state]
    `#(noreply ,state)))
@@ -76,11 +70,12 @@
 
 (defun code_change (_old-version state _extra) `#(ok ,state))
 
+;;; ====================================================== [ Internal function ]
 
-;;; ============================================================================
-;;; ===                           PRIVATE API                                ===
-;;; ============================================================================
+(defun insert-pool (ref workers)
+  (ets:insert (MODULE) `#(#(pool ,ref) ,workers)))
 
-(defun insert-pool (ref workers) (ets:insert (MODULE) `#(#(pool ,ref) ,workers)))
+(defun insert-new-pool (ref workers)
+  (ets:insert_new (MODULE) `#(#(pool ,ref) ,workers)))
 
-(defun insert-new-pool (ref workers) (ets:insert_new (MODULE) `#(#(pool ,ref) ,workers)))
+;;; ==================================================================== [ EOF ]

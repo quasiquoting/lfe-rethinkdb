@@ -1,7 +1,0 @@
-{application, lfe_rethinkdb,
- [{description,  "An LFE driver for RethinkDB."},
-  {vsn,          "1"},
-  {registered,   ['lr-sup', 'lr-workers-sup']},
-  {applications, [kernel, stdlib]},
-  {mod,          {'lr-app', []}},
-  {env,          [{timeout, 30000}]}]}.

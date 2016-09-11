@@ -1,0 +1,10 @@
+{application, rethinkdb,
+ [{description,  "An BEAM driver for RethinkDB."},
+  {vsn,          "0.0.1"},
+  {registered,   [rethinkdb_sup, rethinkdb_workers_sup]},
+  {applications, [kernel, stdlib]},
+  {mod,          {rethinkdb, []}},
+  {env,          [{timeout, 30000},
+                  {'source-uri',
+                   "https://github.com/quasiquoting/lfe-rethinkdb"
+                   "/blob/master/{filepath}#L{line}"}]}]}.

@@ -1,4 +1,4 @@
-(defmodule ql2-util
+(defmodule rethinkdb_util
   (export (datum-value 1) (global-db 1)))
 
 (include-file "include/ql2.hrl")
@@ -17,5 +17,5 @@
      ,(datum-value (Datum.AssocPair-val obj))))
 
 (defun global-db (value)
-  (let ((val (make-Term type 'DB args `(,(lr-query:expr value)))))
+  (let ((val (make-Term type 'DB args `(,(rethinkdb_query:expr value)))))
     (make-Query.AssocPair key #"db" val val)))

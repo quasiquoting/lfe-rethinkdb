@@ -1,8 +1,8 @@
-(defmodule lr-net
+(defmodule rethinkdb_net
   (export (handshake 2)
           (recv 1)
           (stream-recv 2) (stream-poll 2))
-  (import (from lr-data (le-32-int 1) (len 1))))
+  (import (from rethinkdb_data (le-32-int 1) (len 1))))
 
 ;;; http://rethinkdb.com/docs/writing-drivers/
 
@@ -12,10 +12,7 @@
 
 (defun STOP () (ql2:enum_value_by_symbol 'Query.QueryType 'STOP))
 
-
-;;; ============================================================================
-;;; ===                            PUBLIC API                                ===
-;;; ============================================================================
+;;; ==================================================================== [ API ]
 
 (defun handshake (sock auth-key)
   (let (('ok (gen_tcp:send sock (V0_4)))
@@ -54,13 +51,10 @@
           ((= `#(error ,_reason) failure) failure)
           (`#(ok ,packet)
            ;; TODO: validate type
-           (spawn (lambda () (! pid (lr-response:get-response (ljson:decode packet)))))
+           (spawn (lambda () (! pid (rethinkdb_response:get-response (jsx:decode packet)))))
            (stream-poll `#(,socket ,token) pid))))))))
 
-
-;;; ============================================================================
-;;; ===                           PRIVATE API                                ===
-;;; ============================================================================
+;;; ===================================================== [ Internal functions ]
 
 ;; TODO: should this use =:= instead of == ?
 (defun is-null-terminated? (b) (== (binary:at b (- (iolist_size b) 1)) 0))
@@ -85,5 +79,7 @@
 (defun next (_query) 'continue)
 
 (defun stream-stop (socket token)
-  (let* ((`#(,length ,query) (len (ljson:encode `(,(STOP)))))
+  (let* ((`#(,length ,query) (len (jsx:encode `(,(STOP)))))
          ('ok     (gen_tcp:send socket `(,token ,length ,query))))))
+
+;;; ==================================================================== [ EOF ]

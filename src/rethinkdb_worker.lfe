@@ -1,4 +1,4 @@
-(defmodule lr-worker
+(defmodule rethinkdb_worker
   (behaviour gen_server)
   ;; API
   (export (start_link 2) (use 2) (query 2))
@@ -14,20 +14,17 @@
 
 ;;; http://rethinkdb.com/docs/writing-drivers/
 
-(defun V0_4 () (lr-data:le-32-int (ql2:enum_value_by_symbol 'VersionDummy.Version 'V0_4)))
+(defun V0_4 () (rethinkdb_data:le-32-int (ql2:enum_value_by_symbol 'VersionDummy.Version 'V0_4)))
 
-(defun JSON () (lr-data:le-32-int (ql2:enum_value_by_symbol 'VersionDummy.Protocol 'JSON)))
+(defun JSON () (rethinkdb_data:le-32-int (ql2:enum_value_by_symbol 'VersionDummy.Protocol 'JSON)))
 
 ;; (defun STOP () (ql2:enum_value_by_symbol 'Query.QueryType 'STOP))
 
-
-;;; ============================================================================
-;;; ===                            PUBLIC API                                ===
-;;; ============================================================================
+;;; ==================================================================== [ API ]
 
 (defun start_link (ref opts)
   (let ((`#(ok ,pid) (gen_server:start_link (MODULE) `(,opts) '())))
-    (lr-server:add-worker ref pid)
+    (rethinkdb_server:add-worker ref pid)
     `#(ok ,pid)))
 
 (defun use
@@ -38,10 +35,7 @@
   (let ((timeout (application:get_env 'lfe-rethinkdb 'timeout 30000)))
     (gen_server:call pid `#(query ,query) timeout)))
 
-
-;;; ============================================================================
-;;; ===                       gen_server callbacks                           ===
-;;; ============================================================================
+;;; =================================================== [ gen_server callbacks ]
 
 (defun init
   ([`(,opts)]
@@ -83,10 +77,7 @@
 
 (defun code_change (_old-version state _extra) `#(ok ,state))
 
-
-;;; ============================================================================
-;;; ===                           PRIVATE API                                ===
-;;; ============================================================================
+;;; ===================================================== [ Internal functions ]
 
 (defun send-and-recv (socket query)
   (send socket query)
@@ -96,7 +87,7 @@
 
 (defun send (socket query)
   (let* ((token (binary ((Query-token query) (size 64) little)))
-         (`#(,length ,data) (lr-data:len (lr-query:encode-query query))))
+         (`#(,length ,data) (rethinkdb_data:len (rethinkdb_query:encode-query query))))
     (gen_tcp:send socket `(,token ,length ,data))))
 
 (defun recv (socket)
@@ -124,7 +115,7 @@
 
 (defun login (socket auth-key)
   (let (('ok (gen_tcp:send socket (V0_4)))
-        ('ok (gen_tcp:send socket (tuple_to_list (lr-data:len auth-key))))
+        ('ok (gen_tcp:send socket (tuple_to_list (rethinkdb_data:len auth-key))))
         ('ok (gen_tcp:send socket (JSON)))
         (`#(ok ,response) (read-until-null socket)))
     (case (== response #"SUCCESS\x0;")
@@ -147,3 +138,5 @@
     (case (is-null-terminated? response)
       ('true  `#(ok ,(iolist_to_binary result)))
       ('false (read-until-null socket result)))))
+
+;;; ==================================================================== [ EOF ]
