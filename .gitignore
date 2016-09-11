@@ -5,6 +5,5 @@ ebin
 *.beam
 .DS_Store
 _build
-rebar.lock
 
 rethinkdb_data
