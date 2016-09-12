@@ -1,23 +1,18 @@
-PROJECT   = lfe-rethinkdb
-REBAR    := $(shell which rebar)
-VERSION   = 0.1
+REBAR3 ?= @$(shell which rebar3)
 
 .PHONY: all
-all: get-deps compile repl
+all: compile
 
 clean:
-	$(REBAR) clean
-
-get-deps:
-	$(REBAR) get-deps
+	$(REBAR3) clean
 
 compile:
-	$(REBAR) co
+	$(REBAR3) compile
 
 test: eunit
 
 eunit:
-	$(REBAR) eu skip_deps=true
+	$(REBAR3) eunit
 
-repl:
-	rlwrap -a 'dummy' lfe -pa ebin -pa deps/*/ebin -I deps/gpb/include
+shell:
+	$(REBAR3) shell

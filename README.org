@@ -1,8 +1,9 @@
+#+STARTUP: showall
 * lfe-rethinkdb
 An [[https://github.com/rvirding/lfe][LFE]] driver for [[http://rethinkdb.com][RethinkDB]], heavily inspired by [[https://github.com/apa512/clj-rethinkdb][clj-rethinkdb]].
 
 ** Building/Usage
 #+BEGIN_SRC fish
-$ rebar get-deps compile                           # make get-deps compile
-$ lfe -pa ebin -pa deps/*/ebin -I deps/gpb/include # make shell
+  $ rebar3 compile                # make compile
+  $ rebar3 shell                  # make shell
 #+END_SRC
