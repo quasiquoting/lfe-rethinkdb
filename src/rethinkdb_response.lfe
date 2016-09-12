@@ -4,47 +4,38 @@
 ;;; ==================================================================== [ API ]
 
 (defun handle (socket token packet)
-  (let* ((response (jsx:decode packet))
-         (t (get-type response))
-         (r (get-response response)))
-    (cond
-     ((success? t) `#(ok ,r))
-     ((partial? t)
-      ;; (io:format "Partial response <<< Get more data~n")
-      (let* ((recv (spawn 'rethinkdb_net 'stream-recv `(,socket ,token)))
-             (pid  (spawn 'rethinkdb_net 'stream-poll `(#(,socket ,token) ,recv))))
-        ;; (io:format "Do something else here~n")
-        `#(ok #(pid ,pid) ,r)))
-     ((error? t)  `#(error ,r))
-     ('true       '#(error unknown-response)))))
+  (let ((response (jsx:decode packet)))
+    (do-handle socket token (get-type response) (get-response response))))
 
-(defun get-type (response) (val->symbol (proplists:get_value #"t" response)))
+(defun get-type (response)
+  (case (proplists:get_value #"t" response)
+    ('undefined 'undefined)
+    (value      (val->symbol value))))
 
 (defun get-response (response) (proplists:get_value #"r" response))
 
 ;;; ===================================================== [ Internal functions ]
+
+(defun do-handle
+  ([_socket _token t r] (when (orelse (=:= 'SUCCESS_ATOM     t)
+                                      (=:= 'SUCCESS_SEQUENCE t)))
+   `#(ok ,r))
+  ([socket token 'SUCCESS_PARTIAL r]
+   (let* ((recv (spawn 'rethinkdb_net 'stream-recv `(,socket ,token)))
+          (pid  (spawn 'rethinkdb_net 'stream-poll `(#(,socket ,token) ,recv))))
+     `#(ok #(pid ,pid) ,r)))
+  ([_socket _token t r]
+   (error (if (known-error? t) t 'unknown-response) (list r))))
 
 (defun val->symbol (val)
   (try
     (ql2:enum_symbol_by_value 'Response.ResponseType val)
     (catch (_ 'undefined))))
 
-(defun error? (type)
-  (lists:member type '(CLIENT_ERROR COMPILE_ERROR RUNTIME_ERROR)))
-
-(defun partial?
-  (['SUCCESS_PARTIAL] 'true)
-  ([_]                'false))
-
-(defun proplist?
-  (['()]                                 'true)
-  ([`(#(,_ ,_) . ,t)]                    (proplist? t))
-  ([`(,h       . ,t)] (when (is_atom h)) (proplist? t))
-  ([_]                                   'false))
-
-(defun success?
-  (['SUCCESS_ATOM]     'true)
-  (['SUCCESS_SEQUENCE] 'true)
-  ([_]                 'false))
+(defun known-error?
+  (['CLIENT_ERROR]  'true)
+  (['COMPILE_ERROR] 'true)
+  (['RUNTIME_ERROR] 'true)
+  ([_type]          'false))
 
 ;;; ==================================================================== [ EOF ]

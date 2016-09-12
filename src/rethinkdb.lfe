@@ -1,53 +1,61 @@
+;;; ========================================================== [ rethinkdb.lfe ]
+
 (defmodule rethinkdb
+  "RethinkDB driver for the BEAM."
   (behaviour application)
-  (export (start 0) (start 2) (stop 0) (stop 1)
-          (add-pool 2) (add-pool 3) (remove-pool 1)
-          (use 2)
-          (query 2)))
+  (behaviour supervisor)
+  ;; Application callbacks
+  (export (start 2) (stop 1))
+  ;; Supervisor callbacks
+  (export (init 1))
+  ;; API
+  (export (start 0) (stop 0))
+  (export (use 2) (query 2)))
+
+;;; ================================================== [ Application callbacks ]
+
+(defun start (_type _args)
+  (supervisor:start_link #(local rethinkdb_sup) (MODULE) []))
+
+(defun stop (_state) 'ok)
+
+;;; =================================================== [ Supervisor callbacks ]
+
+(defun init
+  (['()]
+   (let* ((`#(ok ,pools) (application:get_env (MODULE) 'pools))
+          (pool-specs    (lists:map #'pool-spec/1 pools))
+          (sup-flags     (map 'strategy  'one_for_one
+                              'intensity  10
+                              'period     10)))
+     `#(ok #(,sup-flags ,pool-specs)))))
 
 ;;; ==================================================================== [ API ]
 
 (defun start ()
   "Start the application."
-  (application:start 'rethinkdb))
-
-(defun start (_type _args) (rethinkdb_sup:start_link))
+  (application:start (MODULE)))
 
 (defun stop ()
   "Stop the application."
   (application:stop 'rethinkdb))
 
-(defun stop (_state) 'ok)
+(defun use (pool-name db-name)
+  (let* ((worker (poolboy:checkout pool-name 'false))
+         (result (rethinkdb_worker:use worker db-name)))
+    (poolboy:checkin pool-name worker)))
 
-(defun add-pool
-  ([ref num-workers] (when (> num-workers 0))
-   (add-pool ref num-workers '())))
+(defun query (pool-name raw-query)
+  (let ((term (rethinkdb_query:build-query raw-query)))
+    (poolboy:transaction pool-name (rethinkdb_worker:query term))))
 
-(defun add-pool
-  ([ref num-workers opts] (when (> num-workers 0))
-   (let* (('ok (rethinkdb_server:add-pool ref))
-          (sup-opts `#(#(rethinkdb_workers-sup ,ref)
-                       #(rethinkdb_workers-sup start_link [])
-                       permanent 5000 supervisor [rethinkdb_workers-sup]))
-          (`#(ok ,sup-pid) (supervisor:start_child 'rethinkdb_sup sup-opts)))
-     (lists:foreach
-       (lambda (_) (let ((`#(ok ,_) (supervisor:start_child sup-pid `(,ref ,opts))))))
-       (lists:seq 1 num-workers))
-     'ok)))
+;;; ===================================================== [ Internal functions ]
 
-(defun remove-pool (ref)
-  (case (supervisor:terminate_child 'rethinkdb_sup `#(rethinkdb_workers-sup ,ref))
-    ('ok   (supervisor:delete_child 'rethinkdb_sup `#(rethinkdb_workers-sup ,ref)))
-    (error error)))
-
-(defun use
-  ([ref name] (when (is_binary name))
-   (lists:foreach (lambda (pid) (rethinkdb_worker:use pid name))
-     (rethinkdb_server:get-all-workers ref))))
-
-(defun query (ref raw-query)
-  (let ((term (rethinkdb_query:build-query raw-query))
-        (pid  (rethinkdb_server:get-worker ref)))
-    (rethinkdb_worker:query pid term)))
+(defun pool-spec
+  ([`#(,name ,size-args ,worker-args)]
+   (let ((pool-args (list* `#(name #(local ,name))
+                           #(worker_module rethinkdb_worker)
+                           size-args)))
+     (poolboy:child_spec name pool-args worker-args))))
 
 ;;; ==================================================================== [ EOF ]

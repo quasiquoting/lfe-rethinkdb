@@ -6,7 +6,7 @@
 (defun len (data) `#(,(le-32-int (iolist_size data)) ,data))
 
 ;; number => little-endian 32-bit integer
-(defun le-32-int (x) (binary (x (size 32) little)))
+(defun le-32-int (x) (binary (x (size 32) little unsigned)))
 
 (defun rand-int (n)
   (apply #'random:seed/3 (tuple_to_list (os:timestamp)))

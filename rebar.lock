@@ -1,8 +1,10 @@
 {"1.1.0",
 [{<<"jsx">>,{pkg,<<"jsx">>,<<"2.8.0">>},0},
+ {<<"pbkdf2">>,{pkg,<<"pbkdf2">>,<<"2.0.0">>},0},
  {<<"poolboy">>,{pkg,<<"poolboy">>,<<"1.5.1">>},0}]}.
 [
 {pkg_hash,[
  {<<"jsx">>, <<"749BEC6D205C694AE1786D62CEA6CC45A390437E24835FD16D12D74F07097727">>},
+ {<<"pbkdf2">>, <<"11C23279FDED5C0027AB3996CFAE77805521D7EF4BABDE2BD7EC04A9086CF499">>},
  {<<"poolboy">>, <<"6B46163901CFD0A1B43D692657ED9D7E599853B3B21B95AE5AE0A777CF9B6CA8">>}]}
 ].

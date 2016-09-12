@@ -1,7 +1,8 @@
 (defmodule rethinkdb_query
-  (export (query 1) (query 2)
+  (export ; (query 1) (query 2)
           (encode-query 1)
           (build-query 1)
+          (token 1)
           (expr 1))
   (export all)) ;; For now... build-query/1 fails otherwise
 
@@ -11,29 +12,31 @@
 
 ;;; ==================================================================== [ API ]
 
-;; I definitely don't love this...
-(defun query (raw-query)
-  "Encode a given raw query and return the result."
-  (query raw-query '[#()]))
+;; (defun query (raw-query)
+;;   "Encode a given raw query and return the result."
+;;   (query raw-query '[#()]))
 
-;; TODO optargs
-(defun query
-  "Given a raw query and a list of options*, call [[build-query/1]] and return
-a Query with a new token (via [[generate-token/0]]).
+;; ;; TODO optargs
+;; (defun query
+;;   "Given a raw query and a list of options†, call [[build-query/1]] and
+;;   return a Query with a new token (via [[generate-token/0]]).
 
-* Currently ignored."
-  ([raw-query _opts] (when (is_list raw-query))
-   (make-Query type 'START
-               query (build-query raw-query)
-               token (generate-token)
-               ;; global_optargs `(,(ql2-util:global-db database))
-               )))
+;;   † Currently ignored."
+;;   ([raw-query _opts] (when (is_list raw-query))
+;;    (make-Query type 'START
+;;                query (build-query raw-query)
+;;                token (generate-token)
+;;                ;; global_optargs `(,(rethinkdb_util:global-db database))
+;;                )))
 
 (defun encode-query
   ([(= query (match-Query type 'START query term global_optargs optargs))]
    (jsx:encode `(,(START) ,(encode-term term)
                  ,(lists:flatmap #'encode-term/1 optargs)))))
 
+(defun token
+  ([(match-Query token token)]
+   (binary (token (size 64) little unsigned))))
 
 ;;; ===================================================== [ Internal functions ]
 
@@ -48,11 +51,10 @@ a Query with a new token (via [[generate-token/0]]).
   (['() result]
    result))
 
-(defun generate-token ()
-  (binary ((rethinkdb_data:rand-int 3709551616) (size 64) little)))
+;; (defun generate-token ()
+;;   (binary ((rethinkdb_data:rand-int 3709551616) (size 64) little)))
 
-
-;;; PREDICATES
+;;; ============================================================= [ Predicates ]
 
 (defun id? (id) (orelse (is_binary id) (is_number id)))
 
@@ -65,8 +67,7 @@ a Query with a new token (via [[generate-token/0]]).
   ([`#(,k ,_v)] (when (is_binary k))    'true)
   ([_]                                  'false))
 
-
-;;; REQL
+;;; =================================================================== [ ReQL ]
 
 (defun db-create
   ([name '()] (when (is_binary name))
@@ -366,8 +367,7 @@ a Query with a new token (via [[generate-token/0]]).
 
 (defun var ([n '()] (term 'VAR `(,(expr n)))))
 
-
-;;; ENCODING
+;;; =============================================================== [ Encoding ]
 
 (defun datum
   (['null]                   (make-Datum type 'R_NULL))
@@ -452,8 +452,7 @@ a Query with a new token (via [[generate-token/0]]).
   ([(match-Term type 'DATUM datum datum)] (encode-datum datum))
   ([(match-Term type type args terms optargs optargs)]
    `(,(ql2:enum_value_by_symbol 'Term.TermType type)
-     ,(lists:map #'encode-term/1 terms)
-     ,(lists:flatmap #'encode-term/1 optargs)))
+     ,(lists:map #'encode-term/1 terms)))
   ([(match-Term.AssocPair key key val val)]
    `(#(,key ,(encode-term val))))
   ([(match-Query.AssocPair key key val val)]
